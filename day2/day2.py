@@ -84,11 +84,7 @@ class Match(object):
 
 def solve1(lines):
     total = 0
-    limits = {
-        'red': 12,
-        'green': 13,
-        'blue': 14,
-    }
+    limits = dict(zip(COLORS, [12, 13, 14])) 
     for l in lines:
         game = Game(l)
         if game.possible_for_limits(limits):
