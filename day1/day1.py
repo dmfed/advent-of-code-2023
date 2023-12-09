@@ -28,7 +28,7 @@ def solve1(lines) -> int:
 def solve2(lines) -> int:
     total = 0
     for l in lines:
-        l = to_digits(l)
+        l = replace_word_with_digit(l)
         total += findsum(l)
     return total
 
@@ -41,7 +41,6 @@ def findsum(line):
 
 def find_digit(line, reverse=False):
     val = ''
-    idx = None
     start, end, step = 0, len(line), 1
     if reverse:
         start, end, step = len(line)-1, -1, -1
@@ -51,16 +50,31 @@ def find_digit(line, reverse=False):
             break
     return val
 
-def to_digits(line):
-    m = re_digit.findall(line)
-    if not m:
-        return line
-    # since words may overlap (e.g. in 'oneight' or 'twone'), we'll 
-    # replace the ocurrence of first and last (possibly overlapping) matches
-    # and return combined string.
-    l1 = re.sub(m[0], digits_dict[m[0]], line, count=1)
-    l2 = re.sub(m[-1], digits_dict[m[-1]], line)
-    return l1+l2
+def replace_word_with_digit(line):
+    start, end, step = 0, len(line), 1
+    found = False
+    for i in range(start, end, step):
+        for word in digits_dict.keys():
+            if line[i:].startswith(word):
+                # just inserting the digit so that our
+                # find_digit func can help with the rest 
+                line = line[:i] + digits_dict[word] + line[i:]
+                found = True
+                break
+        if found:
+            break
+
+    start, end, step = len(line), -1, -1
+    found = False
+    for i in range(start, end, step):
+        for word in digits_dict.keys():
+            if line[:i].endswith(word):
+                line = line[:i] + digits_dict[word]+line[i:]
+                found = True
+                break
+        if found:
+            break
+    return line
    
 
 if __name__ == '__main__':
@@ -75,5 +89,6 @@ if __name__ == '__main__':
 
     y = solve2(lines)
     print(y)
+
 
     
