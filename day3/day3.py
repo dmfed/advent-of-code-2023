@@ -10,7 +10,8 @@ class Scheme(object):
         for line in inp:
             self.grid.append(['.'] + list(line) + ['.'])
         self.grid.append(['.' for _ in range(len(inp[0])+2)])
-        self.part_numbers =[]
+        self.part_numbers = []
+        self.gears = []
 
     def __str__(self):
         out = ''
@@ -70,36 +71,46 @@ class Scheme(object):
 
         x_array.sort()
         return int(found_digit), (y,) + tuple(x_array)
-        
-
+     
     def _find_part_numbers(self):
         symbols = self._find_all_symbols()
         for symbol in symbols:
             found_numbers = self._find_adjacent_numerals(symbol[0], symbol[1])
             self.part_numbers.extend(found_numbers)
 
+    def _find_all_gears(self):
+        symbols = self._find_all_symbols()
+        for symbol in symbols:
+            if self.grid[symbol[0]][symbol[1]] == '*':
+                numerals = self._find_adjacent_numerals(symbol[0], symbol[1])
+                if len(numerals) == 2:
+                    # there are exactly to numerals adjacent
+                    # to a '*' symbol, so this is a gear
+                    self.gears.append(tuple(numerals))
+      
     def find_sum_part_numbers(self):
         self._find_part_numbers()
         return sum(self.part_numbers)
 
-        
-def solve1(lines):
-    scheme = Scheme(lines)
-    return scheme.find_sum_part_numbers()
-
-def solve2(lines):
-    total = 0
-    return total
-
+    def find_sum_gears(self):
+        self._find_all_gears()
+        total = 0
+        for g in self.gears:
+            ratio = g[0] * g[1]
+            total += ratio
+        return total
+            
 
 if __name__ == '__main__':
     r = tools.Reader('input.txt')
     lines = r.read()
 
-    x = solve1(lines)
+    scheme = Scheme(lines)
+
+    x = scheme.find_sum_part_numbers()
     print(x)
 
-    y = solve2(lines)
+    y = scheme.find_sum_gears()
     print(y)
 
     
