@@ -39,13 +39,23 @@ class Scheme(object):
             for xadd in [-1, 0, 1]:
                 x_, y_ = y + yadd, x + xadd
                 if self._isdigit(x_, y_):
+                    # this is suboptimal because we will process the
+                    # numeral adjacent to a symbol three times at max
+                    # like in the following case
+                    # ...*...
+                    # ..123..
+                    # however this saves some lines of code.
+                    # we'll just use memoization with a dict to make sure
+                    # we don't add the same numeral more than once
                     num, coords = self._extend_digit_to_numeral(x_, y_)
-                    # just put it in a map if we found a digit 
-                    # of the same numeral 
                     tmp[coords] = num
         return list(tmp.values())
 
-    def _extend_digit_to_numeral(self, y, x) -> int:
+    def _extend_digit_to_numeral(self, y, x) -> (int, tuple):
+        ''' 
+        this returns the numeral itself plus coordinates where the numeral 
+        has been found (y, x1..xn)
+        '''
         found_digit = self.grid[y][x]
         x_array = [x]
 
