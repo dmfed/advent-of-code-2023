@@ -55,12 +55,11 @@ class CardSet(object):
         copies = [0 for _ in range(len(self.cards))]
         for i in range(len(self.cards)):
             copies[i] += 1
-            for _ in range(copies[i]):
-                matching = self.cards[i]._count_winning_in_have()
-                if i + matching > len(self.cards):
-                    matching = len(self.cards) - 1 - i
-                for j in range(1, matching+1):
-                    copies[i+j] += 1
+            matching = self.cards[i]._count_winning_in_have()
+            if i + matching > len(self.cards):
+                matching = len(self.cards) - 1 - i
+            for j in range(1, matching+1):
+                copies[i+j] += 1 * copies[i]
         return sum(copies)
 
 if __name__ == '__main__':
