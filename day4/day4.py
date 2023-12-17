@@ -7,8 +7,6 @@ class Card(object):
     card_re = re.compile(r'Card +(\d+): ')
     def __init__(self, inp):
         m = self.card_re.search(inp)
-        if not m:
-            print(inp)
         self.card_num = m.group(1)
         inp = inp.replace(m.group(0), '')
         winning, have = inp.split('|')
