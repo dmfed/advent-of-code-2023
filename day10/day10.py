@@ -50,7 +50,7 @@ class Tile(object):
             self.links = [S, E]    
 
     def __str__(self):
-        return f'{self.val} x: {self.x} y: {self.y}'
+        return f'{self.val}' # x: {self.x} y: {self.y}'
 
     def __eq__(self, obj) -> bool:
         return self.x == obj.x and self.y == obj.y
@@ -126,10 +126,12 @@ class Walker(Field):
             while True:
                 self.loop.append(curr)
                 nxt = self.get_adjacent(curr, dir)
-                if not nxt or not nxt.has_link_from(dir.opposite()):
+                if not nxt:
                     break
                 if nxt.val == START:
                     return
+                if not nxt.has_link_from(dir.opposite()):
+                    break
                 curr = nxt
                 dir = nxt.opposite_pipe_end(dir.opposite())
 
@@ -147,17 +149,27 @@ class Walker(Field):
         inside_loop = set()
         for t in self.loop:
             for d in [N, E, S, W]:
-                newt = self.get_adjacent(t, d)
+                newt = self.get_adjacent(t, d) 
                 if not newt or newt in self.visited:
                     continue
-                if self._is_inside_loop(newt):
+                if self._is_inside_loop(newt, [N, E, S, W]):
                     inside_loop.add(newt)
                 self.visited.add(newt)
         return len(inside_loop)
 
 
-    def _is_inside_loop(self, t: Tile) -> bool:
-        # TODO
+    def _is_inside_loop(self, t: Tile, dirs: list[Direction]) -> bool:
+        if not t:
+            return False
+
+        if t in self.loop:
+            return True
+
+        for d in dirs:
+            newt = self.get_adjacent(t, d)
+            if not self._is_inside_loop(newt, [d]):
+                return False
+                
         return True
             
 
@@ -167,8 +179,7 @@ if __name__ == '__main__':
     lines = r.read()
 
     w = Walker(lines)
-    steps = w.find_max_steps_in_loop()
-    print(steps)
+    print(w)
     n = w.find_captured_by_loop()
     print(n)
 
@@ -178,5 +189,6 @@ if __name__ == '__main__':
     w = Walker(lines)
     steps = w.find_max_steps_in_loop()
     print(steps)
-    # print(w.loop)
+    n = w.find_captured_by_loop()
+    print(n)
 
